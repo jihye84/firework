@@ -77,11 +77,12 @@ body.open #sheet{transform:none}
 #sheetTabs #sheetClose{flex:0 0 44px}
 .panel{flex:1;min-height:0;padding:8px 12px 10px;display:none;flex-direction:column;gap:7px;overflow:hidden}
 body[data-s="L"] #panelL,body[data-s="A"] #panelR,body[data-s="B"] #panelR{display:flex}
-.panel h3{margin:4px 0 0;font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.5px}
+.panel h3{display:none}
+#panelL .sep{border-top:1px solid var(--line);margin-top:3px;padding-top:7px}
 .row{display:flex;gap:6px;align-items:center;min-width:0}
 .row>input{flex:1}
 .row.g3>button{flex:1;padding:0 4px}
-.slot{width:100%;aspect-ratio:16/9;max-height:22vh;border-radius:8px;background:#05070f;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--dim)}
+.slot{width:100%;aspect-ratio:16/9;max-height:19vh;border-radius:8px;background:#05070f;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--dim)}
 #ytBox{position:fixed;z-index:31;display:none;border-radius:8px;overflow:hidden;background:#000}
 #ytBox iframe,#ytPlayer{width:100%;height:100%;display:block;border:0}
 .seg{display:flex;gap:3px;flex:1;min-width:0}
@@ -118,7 +119,20 @@ body[data-p="A"] .pt[data-p="A"],body[data-p="B"] .pt[data-p="B"]{display:flex}
 .pact{display:none;gap:6px;margin-top:auto}
 .pact button{flex:1;min-height:42px;font-size:14px}
 .foot{font-size:12px;margin-top:auto}
-@media not all and (min-width:1200px) and (min-aspect-ratio:8/5){#panelL h3{display:none}#panelL .slot{max-height:13vh}#panelL{gap:8px;padding-top:12px}}
+.clip{display:flex;flex-direction:column;gap:2px}
+.clip.off{opacity:.45;pointer-events:none}
+.cliphead{display:flex;align-items:center;gap:5px;font-size:12px}
+.cliphead #clipLbl{flex:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cliprow{display:flex;align-items:center;gap:4px}.cliprow button{min-height:28px;font-size:12px;padding:0 6px}.cliprow .dual{flex:1}
+.dual{position:relative;height:30px;touch-action:none;min-width:0}
+.dual .trk{position:absolute;left:9px;right:9px;top:13px;height:4px;border-radius:2px;background:#232c47}
+.dual .fill{position:absolute;top:0;bottom:0;background:var(--acc);border-radius:2px}
+.dual input{position:absolute;left:0;right:0;top:0;width:100%;height:30px;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
+.dual input::-webkit-slider-runnable-track{background:none;height:30px}
+.dual input::-moz-range-track{background:none}
+.dual input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:18px;height:18px;margin-top:6px;border-radius:50%;background:var(--acc);border:2px solid #fff;cursor:grab}
+.dual input::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;background:var(--acc);border:2px solid #fff;cursor:grab}
+@media not all and (min-width:1200px) and (min-aspect-ratio:8/5){#panelL .slot{max-height:9vh}#panelL .foot{display:none}#panelL{gap:7px;padding-top:10px}}
 .wideonly{display:none!important}
 @media (min-width:1200px) and (min-aspect-ratio:8/5){
   #app{grid-template-columns:272px minmax(0,1fr) 318px;grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"head head head" "left stage right" "time time time"}
@@ -163,21 +177,21 @@ body[data-p="A"] .pt[data-p="A"],body[data-p="B"] .pt[data-p="B"]{display:flex}
     </div>
 
     <section id="panelL" class="panel">
-      <h3>음악</h3>
       <div class="row"><input id="ytUrl" placeholder="유튜브 주소 또는 검색어"><button id="bYt">불러오기</button></div>
       <div id="ytSlot" class="slot">유튜브 주소를 넣으면<br>여기에 영상이 나와요</div>
       <div class="row"><span id="mTitle" class="dim ell" style="flex:1;font-size:12px">음악 없음 · 시계로 재생</span></div>
       <div class="row g3"><button id="bFile">내 음악 파일</button><button id="bNoMusic">음악 빼기</button></div>
+      <div class="clip off sep" id="clip">
+        <div class="cliphead"><span class="dim">쓸 구간</span><span id="clipLbl">음악을 불러오면 고를 수 있어요</span></div>
+        <div class="cliprow"><button id="bClipA" title="지금 위치를 구간 시작으로">시작=지금</button><div class="dual"><div class="trk"><div class="fill" id="clipFill"></div></div><input type="range" id="clipA" min="0" max="100" step="0.1" value="0" aria-label="구간 시작"><input type="range" id="clipB" min="0" max="100" step="0.1" value="100" aria-label="구간 끝"></div><button id="bClipB" title="지금 위치를 구간 끝으로">끝=지금</button></div>
+      </div>
       <input type="file" id="fAudio" accept="audio/*" hidden>
-      <h3>박자</h3>
-      <div class="row"><span class="dim" style="font-size:13px">BPM</span><input id="bpm" type="number" min="40" max="240" style="width:62px;flex:0 0 62px"><button id="bTempo" style="flex:1">탭 템포</button><button id="bBeat0" style="flex:1" title="지금 위치를 첫 박으로">첫 박=지금</button></div>
+      <div class="row sep"><span class="dim" style="font-size:13px">BPM</span><input id="bpm" type="number" min="40" max="240" style="width:62px;flex:0 0 62px"><button id="bTempo" style="flex:1">탭 템포</button><button id="bBeat0" style="flex:1" title="지금 위치를 첫 박으로">첫 박=지금</button></div>
       <div class="row"><span class="dim" style="font-size:13px">박자 맞춤</span><div class="seg" id="segSnap"></div></div>
-      <h3>쇼</h3>
-      <div class="row g3"><button id="bEx">예시 쇼</button><button id="bNew">새로 만들기</button><button id="bShare">링크 복사</button></div>
+      <div class="row sep g3"><button id="bEx">예시 쇼</button><button id="bNew">새로 만들기</button><button id="bShare">링크 복사</button></div>
       <div class="row g3"><button id="bSave">파일로 저장</button><button id="bLoad">파일 열기</button></div>
       <input type="file" id="fShow" accept=".json,application/json" hidden>
-      <h3>보기</h3>
-      <div class="row g3"><button class="tg" data-o="sound">터지는 소리</button><button class="tg" data-o="reflect">물 반사</button><button class="tg" data-o="smoke">연기</button></div>
+      <div class="row sep g3"><button class="tg" data-o="sound">터지는 소리</button><button class="tg" data-o="reflect">물 반사</button><button class="tg" data-o="smoke">연기</button></div>
       <div class="foot dim" id="count"></div>
     </section>
 
@@ -251,7 +265,7 @@ const EXAMPLE=[
 const norm=c=>Object.assign({},DEF,c);
 
 /* ───────── 상태 ───────── */
-const S={cues:[],sel:-1,draft:norm({x:.5,x2:.5}),bpm:120,beat0:0,snap:0,music:{type:'none',id:'',title:''},opts:{sound:true,reflect:true,smoke:true}};
+const S={cues:[],sel:-1,draft:norm({x:.5,x2:.5}),bpm:120,beat0:0,snap:0,music:{type:'none',id:'',title:''},clip:{a:0,b:0},opts:{sound:true,reflect:true,smoke:true}};
 const cur=()=>S.sel>=0&&S.cues[S.sel]?S.cues[S.sel]:S.draft;
 let undoStack=[],lastUndo=0;
 function pushUndo(force){const n=Date.now();if(!force&&n-lastUndo<500)return;lastUndo=n;undoStack.push(JSON.stringify(S.cues));if(undoStack.length>80)undoStack.shift();}
@@ -259,9 +273,9 @@ function undo(){if(!undoStack.length){toast('되돌릴 것이 없어요');return
 
 /* ───────── 저장 ───────── */
 const KEY='fw-designer-v1';let saveT=0;
-function pack(){return {v:1,cues:S.cues,bpm:S.bpm,beat0:S.beat0,snap:S.snap,music:S.music.type==='yt'?S.music:{type:'none'},opts:S.opts};}
+function pack(){return {v:1,cues:S.cues,bpm:S.bpm,beat0:S.beat0,snap:S.snap,music:S.music.type==='yt'?S.music:{type:'none'},clip:S.clip,opts:S.opts};}
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(pack()));}catch(e){}},400);}
-function unpack(o){if(!o||!Array.isArray(o.cues))return false;S.cues=o.cues.map(norm);S.bpm=+o.bpm||120;S.beat0=+o.beat0||0;S.snap=+o.snap||0;if(o.opts)Object.assign(S.opts,o.opts);S.sel=-1;
+function unpack(o){if(!o||!Array.isArray(o.cues))return false;S.cues=o.cues.map(norm);S.bpm=+o.bpm||120;S.beat0=+o.beat0||0;S.snap=+o.snap||0;S.clip=o.clip&&o.music&&o.music.type==='yt'?{a:+o.clip.a||0,b:+o.clip.b||0}:{a:0,b:0};if(o.opts)Object.assign(S.opts,o.opts);S.sel=-1;
   if(o.music&&o.music.type==='yt'&&o.music.id){loadYT(o.music.id,true);}return true;}
 const b64e=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const b64d=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
@@ -505,7 +519,7 @@ const Clock={mode:'none',playing:false,t:0,aT:0,aN:0,_rep:-1,
     if(this.mode==='file'&&audioEl){this.t=audioEl.currentTime;return this.t;}
     if(this.playing)this.t=this.aT+(now-this.aN)/1000;return this.t;},
   dur(){if(this.mode==='yt'&&ytReady&&ytPlayer.getDuration)return ytPlayer.getDuration()||0;if(this.mode==='file'&&audioEl&&isFinite(audioEl.duration))return audioEl.duration;return Math.max(20,showEnd()+2);},
-  play(){ensureAudio();if(this.mode==='yt'){if(ytReady){ytPlayer.playVideo();setTimeout(()=>{if(!Clock.playing)toast('영상 화면을 한 번 눌러 재생해 주세요');},2000);}return;}
+  play(){ensureAudio();if(hasMusic()){const t=this.time();if(t<clipA()-.05||t>=clipB()-.1)this.seek(clipA());}if(this.mode==='yt'){if(ytReady){ytPlayer.playVideo();setTimeout(()=>{if(!Clock.playing)toast('영상 화면을 한 번 눌러 재생해 주세요');},2000);}return;}
     if(this.mode==='file'&&audioEl){audioEl.play().catch(()=>toast('재생하지 못했어요'));return;}
     if(this.t>=this.dur()-.05)this.t=0;this.aT=this.t;this.aN=performance.now();this.playing=true;updPlay();},
   pause(){if(this.mode==='yt'&&ytReady){ytPlayer.pauseVideo();return;}if(this.mode==='file'&&audioEl){audioEl.pause();return;}this.time();this.playing=false;updPlay();},
@@ -517,7 +531,7 @@ function resync(t){EV.forEach(e=>{e.fired=e.fired?e.launch<=t:e.burst<=t;});}
 
 function ytId(s){s=(s||'').trim();if(/^[\w-]{11}$/.test(s))return s;try{const u=new URL(s);if(/youtu\.be$/.test(u.hostname))return u.pathname.slice(1,12);
   const v=u.searchParams.get('v');if(v)return v.slice(0,11);const m=u.pathname.match(/\/(shorts|embed|live|v)\/([\w-]{11})/);if(m)return m[2];}catch(e){}return null;}
-function loadYT(id,silent){S.music={type:'yt',id,title:''};Clock.setMode('yt');ytReady=false;$('#mTitle').textContent='영상을 불러오는 중…';
+function loadYT(id,silent){if(!silent)S.clip={a:0,b:0};S.music={type:'yt',id,title:''};Clock.setMode('yt');ytReady=false;$('#mTitle').textContent='영상을 불러오는 중…';
   if(!(window.YT&&YT.Player)){ytPending=id;if(!ytApiAsked){ytApiAsked=true;const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';
       s.onerror=()=>{toast('유튜브에 연결하지 못했어요');$('#mTitle').textContent='유튜브 연결 실패 · 시계로 재생';Clock.setMode('none');S.music={type:'none'};};document.head.appendChild(s);}return;}
   $('#ytBox').style.display='block';
@@ -529,10 +543,23 @@ function loadYT(id,silent){S.music={type:'yt',id,title:''};Clock.setMode('yt');y
 window.onYouTubeIframeAPIReady=()=>{if(ytPending){const id=ytPending;ytPending=null;loadYT(id);}};
 function updTitle(){try{const d=ytPlayer.getVideoData();if(d&&d.title){S.music.title=d.title;$('#mTitle').textContent='♪ '+d.title;$('#mTitle').title=d.title;save();}else $('#mTitle').textContent='♪ 유튜브 영상';}catch(e){}}
 function noMusic(){if(Clock.mode==='yt'&&ytReady)try{ytPlayer.stopVideo();}catch(e){}if(audioEl){audioEl.pause();}
-  Clock.setMode('none');S.music={type:'none'};$('#ytBox').style.display='none';$('#mTitle').textContent='음악 없음 · 시계로 재생';save();}
+  Clock.setMode('none');S.music={type:'none'};S.clip={a:0,b:0};$('#ytBox').style.display='none';$('#mTitle').textContent='음악 없음 · 시계로 재생';save();}
 
 /* ───────── 박자 ───────── */
 function snapT(t){if(!S.snap||!S.bpm)return Math.max(0,t);const L=60/S.bpm/S.snap;return Math.max(0,S.beat0+Math.round((t-S.beat0)/L)*L);}
+/* ───────── 쓸 구간 ───────── */
+const hasMusic=()=>Clock.mode!=='none'&&Clock.dur()>0;
+const clipA=()=>hasMusic()?clamp(S.clip.a,0,Clock.dur()):0;
+const clipB=()=>{if(!hasMusic())return Clock.dur();const d=Clock.dur();return S.clip.b>0?clamp(S.clip.b,clipA()+.5,d):d;};
+let clipDur=-1;
+function refreshClip(){const on=hasMusic(),box=$('#clip');box.classList.toggle('off',!on);const ia=$('#clipA'),ib=$('#clipB');
+  if(!on){$('#clipLbl').textContent='음악을 불러오면 고를 수 있어요';$('#clipFill').style.cssText='left:0;right:0';clipDur=-1;return;}
+  const d=Clock.dur(),a=clipA(),b=clipB();if(d!==clipDur){clipDur=d;ia.max=ib.max=d.toFixed(1);}
+  if(document.activeElement!==ia)ia.value=a;if(document.activeElement!==ib)ib.value=b;
+  $('#clipFill').style.cssText=`left:${a/d*100}%;right:${100-b/d*100}%`;$('#clipLbl').textContent=`${fmtS(a)} ~ ${fmtS(b)} (${fmtS(b-a)})`;}
+function setClip(a,b,which){const d=Clock.dur();a=clamp(a,0,d);b=clamp(b,0,d);if(b-a<1){if(which==='a')a=Math.max(0,b-1);else b=Math.min(d,a+1);}
+  S.clip={a:+a.toFixed(1),b:b>=d-.05?0:+b.toFixed(1)};refreshClip();save();}
+function fitClipView(){if(!hasMusic())return;const a=clipA(),b=Math.max(clipB(),showEnd());View.start=Math.max(0,a-1);View.len=Math.max(3,b-a+2);}
 let taps=[];
 function tapTempo(){const n=performance.now();taps=taps.filter(x=>n-x<2500);taps.push(n);if(taps.length>=3){const d=(taps[taps.length-1]-taps[0])/(taps.length-1);S.bpm=Math.round(60000/d);$('#bpm').value=S.bpm;save();toast('BPM '+S.bpm);}else toast('박자에 맞춰 몇 번 더 눌러 주세요');}
 
@@ -554,6 +581,8 @@ function cueY(c,L){return lerp(L.skyB-6,L.top+8,(c.size-3)/9);}
 function drawTL(t){const w=tl.clientWidth,h=tl.clientHeight,g=tx,L=lanes(h),v0=View.start,vl=View.len,X=s=>(s-v0)/vl*w;
   g.clearRect(0,0,w,h);g.fillStyle='#0d1222';g.fillRect(0,L.brT-2,w,L.brB-L.brT+4);
   const d=Clock.dur();if(Clock.mode!=='none'&&d>0&&X(d)<w){g.fillStyle='#00000066';g.fillRect(X(d),0,w-X(d),h);}
+  if(hasMusic()){const ca=X(clipA()),cb=X(clipB());g.fillStyle='#000000aa';if(ca>0)g.fillRect(0,0,ca,h);if(cb<w)g.fillRect(cb,0,w-cb,h);
+    g.fillStyle='#ffc657';[ca,cb].forEach((x,i)=>{if(x>=-2&&x<=w+2){g.fillRect(x-1,0,2,h);g.beginPath();g.moveTo(x,8);g.lineTo(x+(i?-7:7),0);g.lineTo(x,0);g.fill();}});}
   if(S.bpm>0){const bl=60/S.bpm;if(bl/vl*w>=5){let k=Math.ceil((v0-S.beat0)/bl);for(;;k++){const bt=S.beat0+k*bl;if(bt>v0+vl)break;if(bt<0)continue;const x=X(bt);g.fillStyle=k%4===0?'#2a3560':'#1a2140';g.fillRect(x,14,1,h-14);}}}
   const steps=[.5,1,2,5,10,15,30,60,120];let st=steps.find(s=>s/vl*w>=56)||120;g.fillStyle='#8d96b4';g.font='11px system-ui,sans-serif';g.textBaseline='top';
   for(let s=Math.ceil(v0/st)*st;s<=v0+vl;s+=st){const x=X(s);g.fillRect(x,0,1,5);g.fillText(st<1?fmt(s):fmtS(s),x+3,2);}
@@ -580,7 +609,7 @@ tl.addEventListener('pointerup',()=>{if(tlDrag&&tlDrag.moved)save();tlDrag=null;
 tl.addEventListener('wheel',e=>{e.preventDefault();const r=tl.getBoundingClientRect(),f=(e.clientX-r.left)/r.width;
   if(e.ctrlKey||e.metaKey||Math.abs(e.deltaY)>Math.abs(e.deltaX)&&!e.shiftKey){const at=View.start+f*View.len,k=Math.exp(e.deltaY*.0015);View.len=clamp(View.len*k,3,total());View.start=clamp(at-f*View.len,0,Math.max(0,total()-View.len));}
   else View.start=clamp(View.start+(e.deltaX||e.deltaY)/r.width*View.len,0,Math.max(0,total()-View.len));},{passive:false});
-$$('#zoom button').forEach(b=>b.onclick=()=>{const z=b.dataset.z,mid=View.start+View.len/2;if(z==='all'){View.start=0;View.len=total();return;}
+$$('#zoom button').forEach(b=>b.onclick=()=>{const z=b.dataset.z,mid=View.start+View.len/2;if(z==='all'){if(hasMusic()){fitClipView();return;}View.start=0;View.len=total();return;}
   View.len=clamp(View.len*(z==='+'?1/1.6:1.6),3,total());View.start=clamp(mid-View.len/2,0,Math.max(0,total()-View.len));});
 
 /* ───────── 편집판 ───────── */
@@ -664,7 +693,7 @@ let ybLast='';function placeYT(){const box=$('#ytBox');if(S.music.type!=='yt'||b
   const k=`${r.left|0},${r.top|0},${r.width|0},${r.height|0}`;if(k!==ybLast){ybLast=k;Object.assign(box.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});}}
 
 /* ───────── 메인 루프 ───────── */
-let lastR=performance.now()/1000,lastT=0;
+let lastR=performance.now()/1000,lastT=0,clipTick=0;
 function frame(now){const rnow=now/1000,dt=Math.min(.1,Math.max(0,rnow-lastR));lastR=rnow;
   const t=Clock.time();let mdt=t-lastT;if(mdt<-.02||mdt>.6){resync(t);mdt=0;}
   if(Clock.playing){for(const e of EV)if(!e.fired&&e.launch<=t){e.fired=true;if(t<e.burst+.3)fireShell(e,t-e.launch);}
@@ -673,8 +702,9 @@ function frame(now){const rnow=now/1000,dt=Math.min(.1,Math.max(0,rnow-lastR));l
   lastT=t;
   for(let i=liveEv.length-1;i>=0;i--){const e=liveEv[i];if(rnow>=e.launch){fireShell(e,rnow-e.launch);liveEv.splice(i,1);}}
   for(let i=liveEm.length-1;i>=0;i--){const m=liveEm[i];if(rnow>=m.end){liveEm.splice(i,1);continue;}if(rnow>=m.start)runEmitter(m,rnow,dt);}
+  if(Clock.playing&&hasMusic()&&t>=clipB()){Clock.pause();toast('고른 구간이 끝났어요');}
   if(Clock.mode==='none'&&Clock.playing&&t>=Clock.dur()){Clock.playing=false;Clock.t=Clock.dur();updPlay();}
-  update(dt);render(rnow,dt);drawTL(t);updHUD(t);placeYT();
+  update(dt);render(rnow,dt);drawTL(t);updHUD(t);placeYT();if(++clipTick%15===0)refreshClip();
   requestAnimationFrame(frame);}
 
 /* ───────── 이벤트 연결 ───────── */
@@ -691,7 +721,7 @@ function bind(){
   $('#mEdit').onclick=()=>{const o=document.body.classList.toggle('open');$('#mEdit').textContent=o?'닫기 ▼':'편집 ▲';};
   $('#sheetClose').addEventListener('click',()=>{$('#mEdit').textContent='편집 ▲';});
   for(const id of ['bPlay','mPlay'])$('#'+id).onclick=()=>Clock.toggle();
-  for(const id of ['bHome','mHome'])$('#'+id).onclick=()=>{Clock.seek(0);View.start=0;};
+  for(const id of ['bHome','mHome'])$('#'+id).onclick=()=>{Clock.seek(clipA());View.start=Math.max(0,clipA()-1);};
   for(const id of ['bTap','mTap','bAdd'])$('#'+id).onclick=tapAdd;
   for(const id of ['bPrev','mPrev'])$('#'+id).onclick=preview;
   $('#bUndo').onclick=undo;$('#bDel').onclick=delSel;$('#bDesel').onclick=()=>selectCue(-1);
@@ -701,8 +731,15 @@ function bind(){
   $('#bFile').onclick=()=>$('#fAudio').click();
   $('#fAudio').onchange=e=>{const f=e.target.files[0];if(!f)return;if(Clock.mode==='yt'&&ytReady)try{ytPlayer.pauseVideo();}catch(_){} $('#ytBox').style.display='none';
     if(!audioEl){audioEl=new Audio();audioEl.addEventListener('play',()=>{Clock.playing=true;updPlay();});audioEl.addEventListener('pause',()=>{Clock.playing=false;updPlay();});audioEl.addEventListener('ended',()=>{Clock.playing=false;updPlay();});}
-    audioEl.src=URL.createObjectURL(f);Clock.setMode('file');S.music={type:'file',title:f.name};$('#mTitle').textContent='♪ '+f.name;e.target.value='';toast('음악 파일을 불러왔어요');save();};
+    audioEl.src=URL.createObjectURL(f);S.clip={a:0,b:0};Clock.setMode('file');S.music={type:'file',title:f.name};$('#mTitle').textContent='♪ '+f.name;e.target.value='';toast('음악 파일을 불러왔어요');save();};
   $('#bNoMusic').onclick=noMusic;
+  const ia=$('#clipA'),ib=$('#clipB');
+  ia.addEventListener('input',()=>{setClip(+ia.value,clipB(),'a');Clock.seek(clipA());});
+  ib.addEventListener('input',()=>{setClip(clipA(),+ib.value,'b');});
+  ib.addEventListener('change',()=>{Clock.seek(Math.max(clipA(),clipB()-4));toast('▶로 끝부분을 들어 보세요');});
+  for(const el of [ia,ib])el.addEventListener('change',()=>{fitClipView();el.blur();});
+  $('#bClipA').onclick=()=>{setClip(Clock.time(),clipB(),'a');fitClipView();toast('시작: '+fmt(clipA()));};
+  $('#bClipB').onclick=()=>{setClip(clipA(),Clock.time(),'b');fitClipView();toast('끝: '+fmt(clipB()));};
   $('#bpm').addEventListener('change',e=>{S.bpm=clamp(+e.target.value||120,40,240);save();refreshPanel();});
   $('#bTempo').onclick=tapTempo;$('#bBeat0').onclick=()=>{S.beat0=+Clock.time().toFixed(3);save();toast('첫 박: '+fmt(S.beat0));};
   $('#bEx').onclick=()=>{pushUndo(true);S.cues=EXAMPLE.map(norm);S.sel=-1;rebuild();refreshPanel();save();Clock.seek(0);View.start=0;View.len=Math.max(30,showEnd()+2);toast('예시 쇼를 불러왔어요 · ▶ 재생');};
